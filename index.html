@@ -266,9 +266,40 @@
       border-bottom: 1px solid var(--line);
       font-size: 0.88rem;
       transition: background 0.12s;
+      flex-wrap: wrap;
     }
     .item-row:last-child { border-bottom: none; }
     .item-row:hover { background: var(--bg-row-hover); }
+
+    .item-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+
+    .inline-input-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #0d080a;
+      border: 1px solid var(--line-bright);
+      padding: 2px 8px;
+    }
+    .inline-input-wrap label {
+      font-size: 0.74rem;
+      color: #fca5a5;
+      white-space: nowrap;
+    }
+    .inline-input-wrap input {
+      width: 130px;
+      height: 28px;
+      padding: 3px 8px;
+      font-size: 0.8rem;
+      border: 1px solid var(--line);
+      background: #090607;
+    }
 
     .choice-group { display: flex; gap: 8px; flex-shrink: 0; }
     .choice-btn {
@@ -436,6 +467,7 @@
             <tr>
               <th>วันที่ตรวจ</th>
               <th>หมายเลข/รหัสกล่อง</th>
+              <th>ไฟทดสอบ</th>
               <th>ผู้ตรวจสอบ</th>
               <th>รวม</th>
               <th>ผ่าน</th>
@@ -520,6 +552,7 @@ const ALL_ITEMS = ALL_SECTIONS.flatMap(function(s) {
 let answers = {};
 let metaDraft = {
   box_code: '',
+  power_voltage: '',
   inspector: '',
   signer_inspector: '',
   signer_approver: '',
@@ -532,6 +565,7 @@ let metaDraft = {
 function syncMetaFromDOM() {
   const mapIds = [
     ['boxCode', 'box_code'],
+    ['powerVoltage', 'power_voltage'],
     ['inspector', 'inspector'],
     ['signerInspector', 'signer_inspector'],
     ['signerApprover', 'signer_approver'],
@@ -549,6 +583,7 @@ function syncMetaFromDOM() {
 function restoreMetaToDOM() {
   const mapIds = [
     ['boxCode', 'box_code'],
+    ['powerVoltage', 'power_voltage'],
     ['inspector', 'inspector'],
     ['signerInspector', 'signer_inspector'],
     ['signerApprover', 'signer_approver'],
@@ -571,12 +606,27 @@ function renderSections() {
     const rowsHtml = sec.items.map(function(name, iIdx) {
       const key = sec.idx + '_' + iIdx;
       const val = answers[key] || '';
+      const extraInput = key === '0_0'
+        ? '<div class="inline-input-wrap">' +
+            '<label for="powerVoltage">ไฟทดสอบ:</label>' +
+            '<input type="text" id="powerVoltage" list="voltagePresets" placeholder="เช่น 24 V / 12 V">' +
+            '<datalist id="voltagePresets">' +
+              '<option value="24 VDC">' +
+              '<option value="12 VDC">' +
+              '<option value="9 VDC">' +
+            '</datalist>' +
+          '</div>'
+        : '';
+
       return (
         '<div class="item-row">' +
           '<span>' + name + '</span>' +
-          '<div class="choice-group">' +
-            '<button type="button" class="choice-btn ok ' + (val === 'ปกติ' ? 'active' : '') + '" onclick="setChoice(\'' + key + '\', \'ปกติ\')">ปกติ</button>' +
-            '<button type="button" class="choice-btn ng ' + (val === 'ผิดปกติ' ? 'active' : '') + '" onclick="setChoice(\'' + key + '\', \'ผิดปกติ\')">ผิดปกติ</button>' +
+          '<div class="item-controls">' +
+            extraInput +
+            '<div class="choice-group">' +
+              '<button type="button" class="choice-btn ok ' + (val === 'ปกติ' ? 'active' : '') + '" onclick="setChoice(\'' + key + '\', \'ปกติ\')">ปกติ</button>' +
+              '<button type="button" class="choice-btn ng ' + (val === 'ผิดปกติ' ? 'active' : '') + '" onclick="setChoice(\'' + key + '\', \'ผิดปกติ\')">ผิดปกติ</button>' +
+            '</div>' +
           '</div>' +
         '</div>'
       );
@@ -631,6 +681,7 @@ function clearForm() {
   answers = {};
   metaDraft = {
     box_code: '',
+    power_voltage: '',
     inspector: '',
     signer_inspector: '',
     signer_approver: '',
@@ -658,10 +709,15 @@ async function submitChecksheet() {
   const okCount = vals.filter(function(v) { return v === 'ปกติ'; }).length;
   const ngCount = vals.filter(function(v) { return v === 'ผิดปกติ'; }).length;
   const inspectorVal = metaDraft.signer_inspector.trim() || metaDraft.inspector.trim() || '-';
+  const voltageVal = metaDraft.power_voltage.trim();
+
+  const detailPayload = Object.assign({}, answers);
+  if (voltageVal) detailPayload.power_voltage = voltageVal;
 
   const record = {
     check_date: document.getElementById('checkDate').value,
     box_code: metaDraft.box_code.trim() || '-',
+    power_voltage: voltageVal || '-',
     inspector: inspectorVal,
     approver: metaDraft.signer_approver.trim() || '-',
     burnin_start: metaDraft.burnin_start.trim(),
@@ -671,7 +727,7 @@ async function submitChecksheet() {
     ok_count: okCount,
     ng_count: ngCount,
     remark: metaDraft.remark.trim() || '-',
-    detail: answers
+    detail: detailPayload
   };
 
   const localHistory = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
@@ -710,6 +766,12 @@ function formatBurnin(r) {
   return '-';
 }
 
+function getVoltageDisplay(r) {
+  if (r.power_voltage && r.power_voltage !== '-') return r.power_voltage;
+  if (r.detail && r.detail.power_voltage) return r.detail.power_voltage;
+  return '-';
+}
+
 function renderHistory(list) {
   const tbody = document.getElementById('historyBody');
   tbody.innerHTML = (list || []).map(function(r) {
@@ -717,6 +779,7 @@ function renderHistory(list) {
       '<tr>' +
         '<td>' + (r.check_date || '-') + '</td>' +
         '<td><strong>' + (r.box_code || '-') + '</strong></td>' +
+        '<td>' + getVoltageDisplay(r) + '</td>' +
         '<td>' + (r.inspector || '-') + '</td>' +
         '<td>' + (r.total_items != null ? r.total_items : ALL_ITEMS.length) + '</td>' +
         '<td style="color:#34d399;font-weight:600;">' + (r.ok_count != null ? r.ok_count : 0) + '</td>' +
