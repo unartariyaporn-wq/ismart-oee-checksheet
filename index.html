@@ -17,8 +17,6 @@
       --text: #f1f5f9;
       --muted: #94a3b8;
       --red: #dc2626;
-      --red-dark: #991b1b;
-      --blue: #2563eb;
       --green: #10b981;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,7 +29,6 @@
     }
     .container { max-width: 1120px; margin: 0 auto; }
 
-    /* Top Banner */
     .top-banner {
       background: var(--bg-header);
       border: 1px solid var(--border-bright);
@@ -111,7 +108,6 @@
     }
     .btn-primary:hover { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
 
-    /* Meta + Live KPI Strip */
     .control-strip {
       display: grid;
       grid-template-columns: 170px 210px 1fr 250px;
@@ -153,7 +149,6 @@
       align-items: center;
     }
     .freq-pill {
-      align-self: flex-start;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -170,15 +165,13 @@
       user-select: none;
     }
     .freq-pill input[type="radio"] {
-      display: block;
-      flex-shrink: 0;
       width: 14px;
       height: 14px;
       margin: 0;
       accent-color: #3b82f6;
       cursor: pointer;
     }
-    .freq-pill:has(input:checked) {
+    .freq-pill.active {
       border-color: #3b82f6;
       background: rgba(37, 99, 235, 0.22);
       color: #fff;
@@ -207,7 +200,6 @@
     .mini-kpi.ok .v { color: #34d399; }
     .mini-kpi.ng .v { color: #f87171; }
 
-    /* Single-Column Sequential Stack (1 -> 8) */
     .sections-stack {
       display: flex;
       flex-direction: column;
@@ -230,4 +222,438 @@
       align-items: center;
       gap: 8px;
     }
-    .sec-title-wrap { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.94rem
+    .sec-title-wrap { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.94rem; }
+    .sec-num {
+      background: var(--red);
+      color: #fff;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+    .sec-count {
+      font-size: 0.74rem;
+      color: var(--muted);
+      background: #0b1019;
+      border: 1px solid var(--border);
+      padding: 2px 9px;
+      border-radius: 2px;
+    }
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(38, 50, 71, 0.65);
+      font-size: 0.88rem;
+      transition: background 0.12s;
+    }
+    .item-row:hover { background: var(--bg-row-hover); }
+    .item-row:last-child { border-bottom: none; }
+
+    .choice-group { display: flex; gap: 8px; flex-shrink: 0; }
+    .choice-btn {
+      min-width: 74px;
+      border: 1px solid var(--border-bright);
+      background: #090d16;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .choice-btn:hover { border-color: #94a3b8; color: #fff; }
+    .choice-btn.ok.active {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: var(--green);
+      color: #6ee7b7;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+    .choice-btn.ng.active {
+      background: rgba(220, 38, 38, 0.28);
+      border-color: var(--red);
+      color: #fca5a5;
+      box-shadow: 0 0 10px rgba(220, 38, 38, 0.25);
+    }
+
+    .bottom-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-header h2 { font-size: 0.96rem; font-weight: 600; }
+    .remark-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+    th { background: #141c2b; color: #cbd5e1; font-weight: 600; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-banner">
+      <div class="brand-lockup">
+        <div class="smc-logo-box" id="smcLogoBox">
+          <img src="cropped-SMC-logo.png" alt="SMC a member of EECi ARIPOLIS" onerror="document.getElementById('smcLogoBox').style.display='none'">
+        </div>
+        <div>
+          <div class="brand-row">
+            <span class="tag-eeci">Station iSmart OEE TESTBED</span>
+            <span class="tag-sync" id="syncBadge">Google Sheets: พร้อมบันทึก</span>
+          </div>
+          <h1>แบบตรวจสอบและบำรุงรักษาอุปกรณ์ประจำสถานี</h1>
+          <p class="sub">การตรวจสอบอุปกรณ์ • การตรวจสอบการทำงานของระบบ • การคำนวณค่า OEE และ Dashboard</p>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn" type="button" onclick="markAllOK()">ติ๊ก "ปกติ" ทั้งหมด</button>
+        <button class="btn" type="button" onclick="clearForm()">ล้างค่า</button>
+        <button class="btn btn-primary" type="button" onclick="submitChecksheet()">บันทึกผลลง Google Sheets</button>
+      </div>
+    </div>
+
+    <div class="control-strip">
+      <div class="field">
+        <label for="checkDate">วันที่ตรวจสอบ</label>
+        <input type="date" id="checkDate">
+      </div>
+      <div class="field">
+        <label for="inspector">ผู้ตรวจสอบ</label>
+        <input type="text" id="inspector" placeholder="ระบุชื่อผู้ตรวจสอบ">
+      </div>
+      <div class="field">
+        <label>รอบการตรวจสอบ</label>
+        <div class="freq-row" id="freqRow">
+          <label class="freq-pill active"><input type="radio" name="freq" value="รายวัน" checked onchange="onFreqChange()"> รายวัน</label>
+          <label class="freq-pill"><input type="radio" name="freq" value="รายสัปดาห์" onchange="onFreqChange()"> รายสัปดาห์</label>
+          <label class="freq-pill"><input type="radio" name="freq" value="รายเดือน" onchange="onFreqChange()"> รายเดือน</label>
+          <label class="freq-pill"><input type="radio" name="freq" value="อื่น ๆ" onchange="onFreqChange()"> อื่น ๆ</label>
+          <input type="text" id="freqOther" placeholder="ระบุรอบการตรวจสอบ...">
+        </div>
+      </div>
+      <div class="field">
+        <label>สรุปผลการตรวจสอบ (รายการ)</label>
+        <div class="mini-kpi-group">
+          <div class="mini-kpi"><div class="v" id="sumTotal">30</div><div class="l">ทั้งหมด</div></div>
+          <div class="mini-kpi ok"><div class="v" id="sumOk">0</div><div class="l">ปกติ</div></div>
+          <div class="mini-kpi ng"><div class="v" id="sumNg">0</div><div class="l">ผิดปกติ</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sections-stack" id="sectionsStack"></div>
+
+    <div class="bottom-panel">
+      <div class="panel-header">
+        <h2>บันทึกผลการตรวจสอบ / ปัญหา / แนวทางแก้ไข</h2>
+        <span style="font-size:0.76rem; color:var(--muted);">กรอกรายละเอียดเมื่อพบรายการผิดปกติหรือมีการปรับแก้หน้างาน</span>
+      </div>
+      <textarea id="remark" rows="2" placeholder="บันทึกรายการที่พบความผิดปกติ ปัญหา และแนวทางแก้ไข..."></textarea>
+      <div class="remark-footer">
+        <span style="font-size:0.78rem; color:var(--muted);">* ข้อมูลจะถูกบันทึกเข้าแท็บ <strong>oee_checksheet_logs</strong> บน Google Sheets อัตโนมัติ</span>
+        <button class="btn btn-primary" type="button" onclick="submitChecksheet()">บันทึกผลลง Google Sheets</button>
+      </div>
+    </div>
+
+    <div class="bottom-panel">
+      <div class="panel-header">
+        <h2>ประวัติการบันทึกผลการตรวจสอบ (Equipment Inspection Record)</h2>
+        <button class="btn" type="button" onclick="loadHistory()">รีเฟรชประวัติ</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>วันที่ตรวจ</th>
+              <th>ผู้ตรวจสอบ</th>
+              <th>รอบการตรวจ</th>
+              <th>รวม</th>
+              <th>ปกติ</th>
+              <th>ผิดปกติ</th>
+              <th>บันทึกผลการตรวจสอบ / ปัญหา / แนวทางแก้ไข</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+const OEE_GAS_URL = 'วาง_WEB_APP_URL_ของ_ISMART_OEE_ที่ลงท้ายด้วย_exec_ตรงนี้';
+const LOCAL_KEY = 'ismart_oee_checksheet_v1';
+
+const ALL_SECTIONS = [
+  {
+    idx: 0, num: '1',
+    title: 'ระบบสายพานลำเลียง',
+    items: [
+      'สายพานลำเลียง',
+      'รางเลื่อน',
+      'ชุดจับยึด / ชุดนำชิ้นงาน',
+      'มอเตอร์ / ชุดขับเคลื่อน',
+      'โครงสร้างและจุดยึด'
+    ]
+  },
+  {
+    idx: 1, num: '2',
+    title: 'ระบบตรวจจับและเซนเซอร์',
+    items: [
+      'เซนเซอร์ตรวจจับชิ้นงาน',
+      'เซนเซอร์ตรวจจับระยะ (Proximity)',
+      'สายสัญญาณ'
+    ]
+  },
+  {
+    idx: 2, num: '3',
+    title: 'ระบบควบคุมและอุปกรณ์ควบคุม',
+    items: [
+      'PLC',
+      'ขั้วต่อสาย (Terminal Block)',
+      'รีเลย์ / อุปกรณ์ควบคุม',
+      'ปุ่มสตาร์ท / หยุดการทำงาน'
+    ]
+  },
+  {
+    idx: 3, num: '4',
+    title: 'ระบบไฟฟ้าและแหล่งจ่ายไฟ',
+    items: [
+      'แหล่งจ่ายไฟ (Power Supply)',
+      'สายไฟ / สายจ่ายกำลัง',
+      'เบรกเกอร์ / อุปกรณ์ป้องกัน'
+    ]
+  },
+  {
+    idx: 4, num: '5',
+    title: 'ระบบสื่อสารและเครือข่าย',
+    items: [
+      'สาย LAN / Ethernet',
+      'สวิตช์ (Switch) / อุปกรณ์เครือข่าย',
+      'การสื่อสารระหว่าง PLC กับระบบ OEE'
+    ]
+  },
+  {
+    idx: 5, num: '6',
+    title: 'ระบบแสดงสถานะและ Dashboard',
+    items: [
+      'จอแสดงผล (Monitor)',
+      'ไฟแสดงสถานะ (Tower Light)',
+      'การแสดงข้อมูล (Actual / Target / Diff / Good/NG)',
+      'วันเวลาและสถานะการทำงาน'
+    ]
+  },
+  {
+    idx: 6, num: '7',
+    title: 'ระบบประมวลผลและการคำนวณค่า OEE',
+    items: [
+      'ผลการผลิต (Good / Reject)',
+      'ระยะเวลาการเดินเครื่อง (Operating Time)',
+      'ระยะเวลาหยุดเครื่อง (Downtime)',
+      'อัตราความพร้อมใช้งาน (Availability : A)',
+      'ประสิทธิภาพการเดินเครื่อง (Performance : P)',
+      'อัตราคุณภาพ (Quality : Q)',
+      'ค่า OEE',
+      'การจัดเก็บข้อมูล'
+    ]
+  },
+  {
+    idx: 7, num: '8',
+    title: 'การทดสอบหลังการตรวจสอบและบำรุงรักษา',
+    items: [
+      'ทดสอบการทำงานโดยรวมของระบบ'
+    ]
+  }
+];
+
+const ALL_ITEMS = ALL_SECTIONS.flatMap(function(s) {
+  return s.items.map(function(name, iIdx) {
+    return { key: s.idx + '_' + iIdx, name: name };
+  });
+});
+
+let answers = {};
+
+function renderSections() {
+  const stack = document.getElementById('sectionsStack');
+  if (!stack) return;
+  stack.innerHTML = ALL_SECTIONS.map(function(sec) {
+    const rowsHtml = sec.items.map(function(name, iIdx) {
+      const key = sec.idx + '_' + iIdx;
+      const val = answers[key] || '';
+      return (
+        '<div class="item-row">' +
+          '<span>' + name + '</span>' +
+          '<div class="choice-group">' +
+            '<button type="button" class="choice-btn ok ' + (val === 'ปกติ' ? 'active' : '') + '" onclick="setChoice(\'' + key + '\', \'ปกติ\')">ปกติ</button>' +
+            '<button type="button" class="choice-btn ng ' + (val === 'ผิดปกติ' ? 'active' : '') + '" onclick="setChoice(\'' + key + '\', \'ผิดปกติ\')">ผิดปกติ</button>' +
+          '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    return (
+      '<div class="sec-card">' +
+        '<div class="sec-head">' +
+          '<div class="sec-title-wrap">' +
+            '<span class="sec-num">' + sec.num + '</span>' +
+            '<span>' + sec.title + '</span>' +
+          '</div>' +
+          '<span class="sec-count">' + sec.items.length + ' รายการ</span>' +
+        '</div>' +
+        rowsHtml +
+      '</div>'
+    );
+  }).join('');
+  updateSummary();
+}
+
+function onFreqChange() {
+  const checked = document.querySelector('input[name="freq"]:checked');
+  const val = checked ? checked.value : 'รายวัน';
+  document.querySelectorAll('#freqRow .freq-pill').forEach(function(pill) {
+    const input = pill.querySelector('input[name="freq"]');
+    pill.classList.toggle('active', Boolean(input && input.checked));
+  });
+  const otherInput = document.getElementById('freqOther');
+  const isOther = val === 'อื่น ๆ';
+  otherInput.classList.toggle('show', isOther);
+  if (isOther) otherInput.focus();
+}
+
+function setChoice(key, status) {
+  answers[key] = answers[key] === status ? '' : status;
+  renderSections();
+}
+
+function markAllOK() {
+  ALL_ITEMS.forEach(function(item) { answers[item.key] = 'ปกติ'; });
+  renderSections();
+}
+
+function clearForm() {
+  answers = {};
+  document.getElementById('remark').value = '';
+  renderSections();
+}
+
+function updateSummary() {
+  const vals = Object.values(answers);
+  const okCount = vals.filter(function(v) { return v === 'ปกติ'; }).length;
+  const ngCount = vals.filter(function(v) { return v === 'ผิดปกติ'; }).length;
+  document.getElementById('sumTotal').textContent = ALL_ITEMS.length;
+  document.getElementById('sumOk').textContent = okCount;
+  document.getElementById('sumNg').textContent = ngCount;
+}
+
+function getFrequency() {
+  const checked = document.querySelector('input[name="freq"]:checked');
+  const picked = checked ? checked.value : 'รายวัน';
+  const extra = document.getElementById('freqOther').value.trim();
+  return picked === 'อื่น ๆ' && extra ? 'อื่น ๆ (' + extra + ')' : picked;
+}
+
+async function submitChecksheet() {
+  const vals = Object.values(answers);
+  const okCount = vals.filter(function(v) { return v === 'ปกติ'; }).length;
+  const ngCount = vals.filter(function(v) { return v === 'ผิดปกติ'; }).length;
+  const record = {
+    check_date: document.getElementById('checkDate').value,
+    inspector: document.getElementById('inspector').value.trim() || '-',
+    frequency: getFrequency(),
+    total_items: ALL_ITEMS.length,
+    ok_count: okCount,
+    ng_count: ngCount,
+    remark: document.getElementById('remark').value.trim() || '-',
+    detail: answers
+  };
+
+  const localHistory = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+  localHistory.unshift(record);
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(localHistory));
+  renderHistory(localHistory);
+
+  if (!OEE_GAS_URL.startsWith('https://script.google.com/')) {
+    alert('บันทึกในเครื่องแล้ว (ยังไม่ได้ใส่ OEE_GAS_URL)');
+    return;
+  }
+
+  const badge = document.getElementById('syncBadge');
+  badge.textContent = 'Google Sheets: กำลังบันทึก...';
+  try {
+    const res = await fetch(OEE_GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(record)
+    });
+    const out = await res.json().catch(function() { return { ok: res.ok }; });
+    if (!res.ok || out.ok === false) throw new Error(out.error || 'บันทึกไม่สำเร็จ');
+    badge.textContent = 'Google Sheets: บันทึกแล้ว';
+    await loadHistory();
+    alert('บันทึกผลการตรวจสอบเรียบร้อยแล้วค่ะ');
+  } catch (err) {
+    console.error(err);
+    badge.textContent = 'บันทึกเฉพาะในเครื่อง';
+    alert('บันทึกในเครื่องแล้ว แต่ส่งไป Google Sheets ไม่สำเร็จ');
+  }
+}
+
+function renderHistory(list) {
+  const tbody = document.getElementById('historyBody');
+  tbody.innerHTML = (list || []).map(function(r) {
+    return (
+      '<tr>' +
+        '<td>' + (r.check_date || '-') + '</td>' +
+        '<td>' + (r.inspector || '-') + '</td>' +
+        '<td>' + (r.frequency || '-') + '</td>' +
+        '<td>' + (r.total_items != null ? r.total_items : ALL_ITEMS.length) + '</td>' +
+        '<td style="color:#34d399;font-weight:600;">' + (r.ok_count != null ? r.ok_count : 0) + '</td>' +
+        '<td style="color:#f87171;font-weight:600;">' + (r.ng_count != null ? r.ng_count : 0) + '</td>' +
+        '<td>' + (r.remark || '-') + '</td>' +
+      '</tr>'
+    );
+  }).join('');
+}
+
+async function loadHistory() {
+  const localHistory = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+  renderHistory(localHistory);
+  if (!OEE_GAS_URL.startsWith('https://script.google.com/')) return;
+  try {
+    const res = await fetch(OEE_GAS_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    const data = await res.json();
+    if (data && Array.isArray(data.logs) && data.logs.length > 0) {
+      renderHistory(data.logs);
+    }
+  } catch (err) {
+    console.error('โหลดประวัติไม่สำเร็จ:', err);
+  }
+}
+
+document.getElementById('checkDate').value = new Date().toISOString().slice(0, 10);
+renderSections();
+loadHistory();
+</script>
+</body>
+</html>
