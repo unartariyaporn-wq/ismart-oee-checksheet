@@ -3,383 +3,431 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>แบบตรวจสอบและบำรุงรักษาอุปกรณ์ — Station iSmart OEE</title>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>แบบฟอร์มตรวจสอบกล่อง iSmart OEE — SMC TESTBED</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-base: #07090e;
-      --bg-panel: #0f141e;
-      --bg-header: linear-gradient(90deg, #1a0c12 0%, #111827 52%, #0c192e 100%);
-      --bg-row: #141b29;
-      --bg-row-hover: #1a2334;
-      --border: #263247;
-      --border-bright: #3b4c6b;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
+      --bg-void: #090708;
+      --bg-surface: #110c0e;
+      --bg-card: #161013;
+      --bg-row: #1b1317;
+      --bg-row-hover: #24171d;
+      --line: #361d24;
+      --line-bright: #5c2733;
       --red: #dc2626;
+      --red-bright: #ef4444;
+      --red-glow: rgba(220, 38, 38, 0.22);
+      --blue-accent: #1d4ed8;
       --green: #10b981;
+      --text: #f8fafc;
+      --muted: #a1a1aa;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: 'Prompt', sans-serif;
-      background: radial-gradient(circle at top left, #1c0d14 0%, var(--bg-base) 40%, #091324 100%);
       color: var(--text);
       min-height: 100vh;
       padding: 20px;
+      background-color: var(--bg-void);
+      background-image:
+        radial-gradient(rgba(220, 38, 38, 0.16) 1px, transparent 1px),
+        linear-gradient(135deg, rgba(153, 27, 27, 0.16) 0%, rgba(9, 7, 8, 0.96) 45%, rgba(15, 23, 42, 0.45) 100%);
+      background-size: 16px 16px, 100% 100%;
     }
-    .container { max-width: 1120px; margin: 0 auto; }
 
-    .top-banner {
-      background: var(--bg-header);
-      border: 1px solid var(--border-bright);
-      border-top: 3px solid var(--red);
-      border-radius: 4px;
-      padding: 18px 22px;
-      margin-bottom: 14px;
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      border: 1px solid var(--line-bright);
+      background: rgba(13, 9, 11, 0.92);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Matrix / Pattern Strip */
+    .pattern-band {
+      height: 44px;
+      border-bottom: 1px solid var(--line);
+      background-color: #0e080a;
+      background-image:
+        radial-gradient(circle, rgba(239, 68, 68, 0.35) 1.2px, transparent 1.2px),
+        repeating-linear-gradient(90deg, rgba(220, 38, 38, 0.06) 0px, rgba(220, 38, 38, 0.06) 1px, transparent 1px, transparent 28px);
+      background-size: 8px 8px, 28px 100%;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+      padding: 0 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      color: rgba(248, 113, 113, 0.55);
+      overflow: hidden;
+      white-space: nowrap;
     }
-    .brand-lockup {
+
+    /* Top Grid Header */
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      border-bottom: 1px solid var(--line-bright);
+      background: linear-gradient(90deg, rgba(127, 29, 29, 0.28) 0%, #140d11 55%, rgba(30, 58, 138, 0.18) 100%);
+    }
+    @media (max-width: 860px) { .top-grid { grid-template-columns: 1fr; } }
+
+    .brand-cell {
+      padding: 18px 20px;
       display: flex;
       align-items: center;
       gap: 14px;
       flex-wrap: wrap;
+      border-right: 1px solid var(--line);
     }
+    @media (max-width: 860px) {
+      .brand-cell { border-right: none; border-bottom: 1px solid var(--line); }
+    }
+
     .smc-logo-box {
       background: #ffffff;
       padding: 5px 10px;
-      border-radius: 4px;
+      border: 1px solid #cbd5e1;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid #cbd5e1;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
     }
-    .smc-logo-box img {
-      height: 40px;
-      width: auto;
-      display: block;
-    }
-    .brand-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
-    .tag-eeci {
-      background: rgba(37, 99, 235, 0.22);
-      border: 1px solid #3b82f6;
-      color: #93c5fd;
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 2px 9px;
-      border-radius: 2px;
-    }
-    .tag-sync {
-      background: #162033;
-      border: 1px solid var(--border-bright);
-      color: #cbd5e1;
-      font-size: 0.72rem;
-      padding: 2px 9px;
-      border-radius: 2px;
-    }
-    h1 { font-size: 1.3rem; font-weight: 700; letter-spacing: 0.2px; }
-    .sub { font-size: 0.84rem; color: var(--muted); margin-top: 2px; }
+    .smc-logo-box img { height: 38px; width: auto; display: block; }
 
-    .action-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+    .badge-red {
+      background: rgba(220, 38, 38, 0.22);
+      border: 1px solid var(--red-bright);
+      color: #fca5a5;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-sync {
+      background: #171115;
+      border: 1px solid var(--line-bright);
+      color: #e4e4e7;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+    }
+
+    h1 { font-size: 1.28rem; font-weight: 700; }
+    .sub { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+
+    .action-cell {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      background-image: radial-gradient(rgba(239, 68, 68, 0.14) 1px, transparent 1px);
+      background-size: 10px 10px;
+    }
+
     .btn {
-      background: #161f30;
-      border: 1px solid var(--border-bright);
+      background: #181014;
+      border: 1px solid var(--line-bright);
       color: var(--text);
       font-family: inherit;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 500;
       padding: 8px 14px;
-      border-radius: 3px;
       cursor: pointer;
       transition: 0.15s;
     }
-    .btn:hover { background: #1f2b42; border-color: #64748b; }
+    .btn:hover { background: #26161d; border-color: #f87171; }
     .btn-primary {
       background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-      border-color: #ef4444;
+      border-color: #f87171;
       color: #fff;
       font-weight: 600;
-      box-shadow: 0 0 16px rgba(220, 38, 38, 0.35);
+      box-shadow: 0 0 18px var(--red-glow);
     }
     .btn-primary:hover { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); }
 
-    .control-strip {
+    /* Meta + KPI Grid */
+    .meta-grid {
       display: grid;
-      grid-template-columns: 170px 210px 1fr 250px;
-      gap: 12px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      align-items: center;
+      grid-template-columns: 1.1fr 0.85fr 1fr 1.15fr;
+      border-bottom: 1px solid var(--line-bright);
+      background: var(--bg-surface);
     }
-    @media (max-width: 1024px) { .control-strip { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 640px) { .control-strip { grid-template-columns: 1fr; } }
+    @media (max-width: 1024px) { .meta-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) { .meta-grid { grid-template-columns: 1fr; } }
+
+    .meta-cell {
+      padding: 12px 14px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .meta-cell:last-child { border-right: none; }
 
     .field > label {
       display: block;
-      font-size: 0.74rem;
+      font-size: 0.73rem;
       color: var(--muted);
       margin-bottom: 6px;
       font-weight: 500;
     }
     input[type="text"], input[type="date"], textarea {
       width: 100%;
-      background: #080c14;
-      border: 1px solid var(--border-bright);
+      background: #090607;
+      border: 1px solid var(--line-bright);
       color: var(--text);
       font-family: inherit;
       font-size: 0.84rem;
       padding: 7px 10px;
-      border-radius: 3px;
       height: 36px;
+    }
+    input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
+      outline: none;
+      border-color: var(--red-bright);
     }
     textarea { height: auto; resize: vertical; }
 
-    .freq-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-    .freq-pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      line-height: 1;
-      background: var(--bg-row);
-      border: 1px solid var(--border);
-      padding: 0 12px;
-      height: 36px;
-      border-radius: 3px;
-      cursor: pointer;
-      white-space: nowrap;
-      user-select: none;
-    }
-    .freq-pill input[type="radio"] {
-      width: 14px;
-      height: 14px;
-      margin: 0;
-      accent-color: #3b82f6;
-      cursor: pointer;
-    }
-    .freq-pill.active {
-      border-color: #3b82f6;
-      background: rgba(37, 99, 235, 0.22);
-      color: #fff;
-    }
-    #freqOther {
-      width: 150px;
-      height: 36px;
-      display: none;
-    }
-    #freqOther.show { display: inline-block; }
-
-    .mini-kpi-group {
+    .kpi-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
+      border: 1px solid var(--line-bright);
+      background: #090607;
     }
-    .mini-kpi {
-      background: #090d16;
-      border: 1px solid var(--border);
-      border-radius: 3px;
+    .kpi-box {
       padding: 5px 8px;
       text-align: center;
+      border-right: 1px solid var(--line);
     }
-    .mini-kpi .v { font-size: 1.05rem; font-weight: 700; line-height: 1.2; }
-    .mini-kpi .l { font-size: 0.68rem; color: var(--muted); }
-    .mini-kpi.ok .v { color: #34d399; }
-    .mini-kpi.ng .v { color: #f87171; }
+    .kpi-box:last-child { border-right: none; }
+    .kpi-box .v { font-size: 1.05rem; font-weight: 700; line-height: 1.2; }
+    .kpi-box .l { font-size: 0.68rem; color: var(--muted); }
+    .kpi-box.ok .v { color: #34d399; }
+    .kpi-box.ng .v { color: #f87171; }
 
+    /* Sequential Stack 1 -> 6 */
     .sections-stack {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      margin-bottom: 16px;
     }
-    .sec-card {
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      overflow: hidden;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+
+    .sec-block {
+      border-bottom: 1px solid var(--line-bright);
+      background: var(--bg-card);
     }
+
     .sec-head {
-      background: linear-gradient(90deg, rgba(220,38,38,0.18) 0%, #141c2b 55%, rgba(37,99,235,0.16) 100%);
       padding: 11px 16px;
-      border-bottom: 1px solid var(--border-bright);
+      border-bottom: 1px solid var(--line-bright);
+      background:
+        linear-gradient(90deg, rgba(220, 38, 38, 0.22) 0%, rgba(24, 15, 19, 0.95) 55%, rgba(29, 78, 216, 0.14) 100%),
+        radial-gradient(rgba(248, 113, 113, 0.14) 1px, transparent 1px);
+      background-size: 100% 100%, 10px 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
-    .sec-title-wrap { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.94rem; }
+
+    .sec-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 0.94rem;
+    }
+
     .sec-num {
       background: var(--red);
       color: #fff;
+      font-family: 'JetBrains Mono', monospace;
       font-size: 0.74rem;
       font-weight: 700;
       padding: 2px 8px;
-      border-radius: 2px;
+      border: 1px solid #f87171;
     }
+
     .sec-count {
-      font-size: 0.74rem;
-      color: var(--muted);
-      background: #0b1019;
-      border: 1px solid var(--border);
+      font-size: 0.73rem;
+      color: #fca5a5;
+      background: #12090c;
+      border: 1px solid var(--line-bright);
       padding: 2px 9px;
-      border-radius: 2px;
     }
+
     .item-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 16px;
       padding: 10px 16px;
-      border-bottom: 1px solid rgba(38, 50, 71, 0.65);
+      border-bottom: 1px solid var(--line);
       font-size: 0.88rem;
       transition: background 0.12s;
     }
-    .item-row:hover { background: var(--bg-row-hover); }
     .item-row:last-child { border-bottom: none; }
+    .item-row:hover { background: var(--bg-row-hover); }
 
     .choice-group { display: flex; gap: 8px; flex-shrink: 0; }
     .choice-btn {
       min-width: 74px;
-      border: 1px solid var(--border-bright);
-      background: #090d16;
+      border: 1px solid var(--line-bright);
+      background: #0b0709;
       color: var(--muted);
       font-family: inherit;
       font-size: 0.78rem;
       font-weight: 600;
       padding: 6px 12px;
-      border-radius: 3px;
       cursor: pointer;
       transition: 0.15s;
     }
-    .choice-btn:hover { border-color: #94a3b8; color: #fff; }
+    .choice-btn:hover { border-color: #f87171; color: #fff; }
     .choice-btn.ok.active {
       background: rgba(16, 185, 129, 0.22);
       border-color: var(--green);
       color: #6ee7b7;
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
     }
     .choice-btn.ng.active {
-      background: rgba(220, 38, 38, 0.28);
-      border-color: var(--red);
+      background: rgba(220, 38, 38, 0.3);
+      border-color: var(--red-bright);
       color: #fca5a5;
-      box-shadow: 0 0 10px rgba(220, 38, 38, 0.25);
     }
 
-    .bottom-panel {
-      background: var(--bg-panel);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 16px 18px;
-      margin-bottom: 16px;
+    .burnin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px dashed var(--line-bright);
+      background: #0d080a;
     }
-    .panel-header {
+    @media (max-width: 720px) { .burnin-grid { grid-template-columns: 1fr; } }
+    .burnin-cell {
+      padding: 12px 14px;
+      border-right: 1px solid var(--line);
+    }
+    .burnin-cell:last-child { border-right: none; }
+
+    /* Bottom Panels */
+    .bottom-block {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line-bright);
+      background: var(--bg-surface);
+    }
+    .bottom-block:last-child { border-bottom: none; }
+
+    .block-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
       padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--line);
     }
-    .panel-header h2 { font-size: 0.96rem; font-weight: 600; }
-    .remark-footer {
+    .block-head h2 { font-size: 0.96rem; font-weight: 600; }
+
+    .sign-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 640px) { .sign-grid { grid-template-columns: 1fr; } }
+
+    .block-footer {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 12px;
+      margin-top: 14px;
     }
+
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-    th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
-    th { background: #141c2b; color: #cbd5e1; font-weight: 600; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+    th { background: #190e13; color: #fecaca; font-weight: 600; }
+    tr:hover td { background: rgba(220, 38, 38, 0.06); }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="top-banner">
-      <div class="brand-lockup">
+    <div class="pattern-band" aria-hidden="true">
+      <span>// ISMART_OEE_BOX_QC_MATRIX_01 // RED_GRID_PROTOCOL</span>
+      <span>010101 // BURN_IN // MODBUS_TCP_RTU // 010101</span>
+    </div>
+
+    <div class="top-grid">
+      <div class="brand-cell">
         <div class="smc-logo-box" id="smcLogoBox">
           <img src="cropped-SMC-logo.png" alt="SMC a member of EECi ARIPOLIS" onerror="document.getElementById('smcLogoBox').style.display='none'">
         </div>
         <div>
-          <div class="brand-row">
-            <span class="tag-eeci">Station iSmart OEE TESTBED</span>
-            <span class="tag-sync" id="syncBadge">Google Sheets: พร้อมบันทึก</span>
+          <div class="badges">
+            <span class="badge-red">SMC | iSmart OEE BOX TESTBED</span>
+            <span class="badge-sync" id="syncBadge">Google Sheets: พร้อมบันทึก</span>
           </div>
-          <h1>แบบตรวจสอบและบำรุงรักษาอุปกรณ์ประจำสถานี</h1>
-          <p class="sub">การตรวจสอบอุปกรณ์ • การตรวจสอบการทำงานของระบบ • การคำนวณค่า OEE และ Dashboard</p>
+          <h1>แบบฟอร์มตรวจสอบกล่อง iSmart OEE</h1>
+          <p class="sub">SMC | TESTBED • a member of EECI ARIPOLIS • Equipment Inspection Record</p>
         </div>
       </div>
-      <div class="action-bar">
-        <button class="btn" type="button" onclick="markAllOK()">เลือก "ปกติ" ทั้งหมด</button>
+      <div class="action-cell">
+        <button class="btn" type="button" onclick="markAllOK()">ติ๊ก "ปกติ" ทั้งหมด</button>
         <button class="btn" type="button" onclick="clearForm()">ล้างค่า</button>
         <button class="btn btn-primary" type="button" onclick="submitChecksheet()">บันทึกผลลง Google Sheets</button>
       </div>
     </div>
 
-    <div class="control-strip">
-      <div class="field">
+    <div class="meta-grid">
+      <div class="meta-cell field">
+        <label for="boxCode">หมายเลข/รหัสกล่อง</label>
+        <input type="text" id="boxCode" placeholder="ระบุหมายเลขหรือรหัสกล่อง iSmart OEE">
+      </div>
+      <div class="meta-cell field">
         <label for="checkDate">วันที่ตรวจสอบ</label>
         <input type="date" id="checkDate">
       </div>
-      <div class="field">
+      <div class="meta-cell field">
         <label for="inspector">ผู้ตรวจสอบ</label>
         <input type="text" id="inspector" placeholder="ระบุชื่อผู้ตรวจสอบ">
       </div>
-      <div class="field">
-        <label>รอบการตรวจสอบ</label>
-        <div class="freq-row" id="freqRow">
-          <label class="freq-pill active"><input type="radio" name="freq" value="รายวัน" checked onchange="onFreqChange()"> รายวัน</label>
-          <label class="freq-pill"><input type="radio" name="freq" value="รายสัปดาห์" onchange="onFreqChange()"> รายสัปดาห์</label>
-          <label class="freq-pill"><input type="radio" name="freq" value="รายเดือน" onchange="onFreqChange()"> รายเดือน</label>
-          <label class="freq-pill"><input type="radio" name="freq" value="อื่น ๆ" onchange="onFreqChange()"> อื่น ๆ</label>
-          <input type="text" id="freqOther" placeholder="ระบุรอบการตรวจสอบ...">
-        </div>
-      </div>
-      <div class="field">
+      <div class="meta-cell field">
         <label>สรุปผลการตรวจสอบ (รายการ)</label>
-        <div class="mini-kpi-group">
-          <div class="mini-kpi"><div class="v" id="sumTotal">30</div><div class="l">ทั้งหมด</div></div>
-          <div class="mini-kpi ok"><div class="v" id="sumOk">0</div><div class="l">ปกติ</div></div>
-          <div class="mini-kpi ng"><div class="v" id="sumNg">0</div><div class="l">ผิดปกติ</div></div>
+        <div class="kpi-grid">
+          <div class="kpi-box"><div class="v" id="sumTotal">16</div><div class="l">ทั้งหมด</div></div>
+          <div class="kpi-box ok"><div class="v" id="sumOk">0</div><div class="l">ผ่าน</div></div>
+          <div class="kpi-box ng"><div class="v" id="sumNg">0</div><div class="l">ไม่ผ่าน</div></div>
         </div>
       </div>
     </div>
 
     <div class="sections-stack" id="sectionsStack"></div>
 
-    <div class="bottom-panel">
-      <div class="panel-header">
-        <h2>บันทึกผลการตรวจสอบ / ปัญหา / แนวทางแก้ไข</h2>
-        <span style="font-size:0.76rem; color:var(--muted);">กรอกรายละเอียดเมื่อพบรายการผิดปกติหรือมีการปรับแก้หน้างาน</span>
+    <div class="bottom-block">
+      <div class="block-head">
+        <h2>รายการที่ต้องแก้ไข/ติดตาม และผู้รับผิดชอบ</h2>
+        <span style="font-size:0.76rem; color:var(--muted);">กรอกรายละเอียดเมื่อพบรายการไม่ผ่านหรือมีการติดตามผล</span>
       </div>
-      <textarea id="remark" rows="2" placeholder="บันทึกรายการที่พบความผิดปกติ ปัญหา และแนวทางแก้ไข..."></textarea>
-      <div class="remark-footer">
-        <span style="font-size:0.78rem; color:var(--muted);">* ข้อมูลจะถูกบันทึกเข้าแท็บ <strong>oee_checksheet_logs</strong> บน Google Sheets อัตโนมัติ</span>
+      <textarea id="remark" rows="2" placeholder="บันทึกรายการที่ต้องแก้ไข/ติดตาม ปัญหา และแนวทางแก้ไข..."></textarea>
+      <div class="sign-grid">
+        <div class="field">
+          <label for="signerInspector">ลงชื่อผู้ตรวจสอบ</label>
+          <input type="text" id="signerInspector" placeholder="ระบุชื่อผู้ตรวจสอบ">
+        </div>
+        <div class="field">
+          <label for="signerApprover">ลงชื่อผู้รับทราบ</label>
+          <input type="text" id="signerApprover" placeholder="ระบุชื่อผู้รับทราบ">
+        </div>
+      </div>
+      <div class="block-footer">
+        <span style="font-size:0.78rem; color:var(--muted);">* ข้อมูลจะถูกบันทึกเข้าแท็บ <strong>oee_box_qc_logs</strong> บน Google Sheets อัตโนมัติ</span>
         <button class="btn btn-primary" type="button" onclick="submitChecksheet()">บันทึกผลลง Google Sheets</button>
       </div>
     </div>
 
-    <div class="bottom-panel">
-      <div class="panel-header">
-        <h2>ประวัติการบันทึกผลการตรวจสอบ (Equipment Inspection Record)</h2>
+    <div class="bottom-block">
+      <div class="block-head">
+        <h2>ประวัติการบันทึกผลการตรวจสอบกล่อง iSmart OEE (Equipment Inspection Record)</h2>
         <button class="btn" type="button" onclick="loadHistory()">รีเฟรชประวัติ</button>
       </div>
       <div class="table-wrap">
@@ -387,12 +435,13 @@
           <thead>
             <tr>
               <th>วันที่ตรวจ</th>
+              <th>หมายเลข/รหัสกล่อง</th>
               <th>ผู้ตรวจสอบ</th>
-              <th>รอบการตรวจ</th>
               <th>รวม</th>
-              <th>ปกติ</th>
-              <th>ผิดปกติ</th>
-              <th>บันทึกผลการตรวจสอบ / ปัญหา / แนวทางแก้ไข</th>
+              <th>ผ่าน</th>
+              <th>ไม่ผ่าน</th>
+              <th>Burn-in</th>
+              <th>รายการที่ต้องแก้ไข/ติดตาม</th>
             </tr>
           </thead>
           <tbody id="historyBody"></tbody>
@@ -402,87 +451,62 @@
   </div>
 
 <script>
-const OEE_GAS_URL = 'วาง_WEB_APP_URL_ของ_ISMART_OEE_ที่ลงท้ายด้วย_exec_ตรงนี้';
-const LOCAL_KEY = 'ismart_oee_checksheet_v1';
+const OEE_BOX_GAS_URL = 'https://script.google.com/macros/s/AKfycbwdp2q6aVfODW-K6XyL9OK2y5be4FTU4XjdEvS83oCo0--WP72Zgg2MuY4G-g2Jtloz/exec';
+const LOCAL_KEY = 'ismart_oee_box_qc_v1';
 
 const ALL_SECTIONS = [
   {
     idx: 0, num: '1',
-    title: 'ระบบสายพานลำเลียง',
+    title: 'การจ่ายไฟและการแสดงผล',
     items: [
-      'สายพานลำเลียง',
-      'รางเลื่อน',
-      'ชุดจับยึด / ชุดนำชิ้นงาน',
-      'มอเตอร์ / ชุดขับเคลื่อน',
-      'โครงสร้างและจุดยึด'
+      'แหล่งจ่ายไฟและการเริ่มทำงาน (9-24 VDC)',
+      'Local Dashboard ผ่าน Micro HDMI'
     ]
   },
   {
     idx: 1, num: '2',
-    title: 'ระบบตรวจจับและเซนเซอร์',
+    title: 'การเชื่อมต่อเครือข่ายและ Dashboard',
     items: [
-      'เซนเซอร์ตรวจจับชิ้นงาน',
-      'เซนเซอร์ตรวจจับระยะ (Proximity)',
-      'สายสัญญาณ'
+      'LAN',
+      'Wi-Fi',
+      'Remote Local Dashboard และ Grafana Dashboard',
+      'การเปิด-ปิด Grafana Dashboard'
     ]
   },
   {
     idx: 2, num: '3',
-    title: 'ระบบควบคุมและอุปกรณ์ควบคุม',
+    title: 'Firmware และการรับส่งข้อมูล',
     items: [
-      'PLC',
-      'ขั้วต่อสาย (Terminal Block)',
-      'รีเลย์ / อุปกรณ์ควบคุม',
-      'ปุ่มสตาร์ท / หยุดการทำงาน'
+      'สถานะ Firmware',
+      'FTP Connection',
+      'SMS iSmart OEE'
     ]
   },
   {
     idx: 3, num: '4',
-    title: 'ระบบไฟฟ้าและแหล่งจ่ายไฟ',
+    title: 'การทดสอบ Sensor Input และสัญญาณ',
     items: [
-      'แหล่งจ่ายไฟ (Power Supply)',
-      'สายไฟ / สายจ่ายกำลัง',
-      'เบรกเกอร์ / อุปกรณ์ป้องกัน'
+      'การสื่อสารกับ Arduino ผ่าน RS232',
+      'ไฟแสดงสถานะ DI',
+      'สถานะเครื่องจักรและ Event',
+      'ข้อมูล Product OK/NG และปุ่ม INP6-INP9'
     ]
   },
   {
     idx: 4, num: '5',
-    title: 'ระบบสื่อสารและเครือข่าย',
+    title: 'การสื่อสาร Modbus และการปิดระบบ',
     items: [
-      'สาย LAN / Ethernet',
-      'สวิตช์ (Switch) / อุปกรณ์เครือข่าย',
-      'การสื่อสารระหว่าง PLC กับระบบ OEE'
+      'Modbus TCP',
+      'Modbus RS485',
+      'การปิดกล่อง iSmart OEE'
     ]
   },
   {
     idx: 5, num: '6',
-    title: 'ระบบแสดงสถานะและ Dashboard',
+    title: 'การทดสอบการทำงานต่อเนื่อง (Burn-in Test)',
+    hasBurnin: true,
     items: [
-      'จอแสดงผล (Monitor)',
-      'ไฟแสดงสถานะ (Tower Light)',
-      'การแสดงข้อมูล (Actual / Target / Diff / Good/NG)',
-      'วันเวลาและสถานะการทำงาน'
-    ]
-  },
-  {
-    idx: 6, num: '7',
-    title: 'ระบบประมวลผลและการคำนวณค่า OEE',
-    items: [
-      'ผลการผลิต (Good / Reject)',
-      'ระยะเวลาการเดินเครื่อง (Operating Time)',
-      'ระยะเวลาหยุดเครื่อง (Downtime)',
-      'อัตราความพร้อมใช้งาน (Availability : A)',
-      'ประสิทธิภาพการเดินเครื่อง (Performance : P)',
-      'อัตราคุณภาพ (Quality : Q)',
-      'ค่า OEE',
-      'การจัดเก็บข้อมูล'
-    ]
-  },
-  {
-    idx: 7, num: '8',
-    title: 'การทดสอบหลังการตรวจสอบและบำรุงรักษา',
-    items: [
-      'ทดสอบการทำงานโดยรวมของระบบ'
+      'กล่อง iSmart OEE และระบบที่เกี่ยวข้อง'
     ]
   }
 ];
@@ -494,8 +518,53 @@ const ALL_ITEMS = ALL_SECTIONS.flatMap(function(s) {
 });
 
 let answers = {};
+let metaDraft = {
+  box_code: '',
+  inspector: '',
+  signer_inspector: '',
+  signer_approver: '',
+  burnin_start: '',
+  burnin_end: '',
+  burnin_duration: '',
+  remark: ''
+};
+
+function syncMetaFromDOM() {
+  const mapIds = [
+    ['boxCode', 'box_code'],
+    ['inspector', 'inspector'],
+    ['signerInspector', 'signer_inspector'],
+    ['signerApprover', 'signer_approver'],
+    ['burninStart', 'burnin_start'],
+    ['burninEnd', 'burnin_end'],
+    ['burninDuration', 'burnin_duration'],
+    ['remark', 'remark']
+  ];
+  mapIds.forEach(function(pair) {
+    const el = document.getElementById(pair[0]);
+    if (el) metaDraft[pair[1]] = el.value;
+  });
+}
+
+function restoreMetaToDOM() {
+  const mapIds = [
+    ['boxCode', 'box_code'],
+    ['inspector', 'inspector'],
+    ['signerInspector', 'signer_inspector'],
+    ['signerApprover', 'signer_approver'],
+    ['burninStart', 'burnin_start'],
+    ['burninEnd', 'burnin_end'],
+    ['burninDuration', 'burnin_duration'],
+    ['remark', 'remark']
+  ];
+  mapIds.forEach(function(pair) {
+    const el = document.getElementById(pair[0]);
+    if (el) el.value = metaDraft[pair[1]];
+  });
+}
 
 function renderSections() {
+  syncMetaFromDOM();
   const stack = document.getElementById('sectionsStack');
   if (!stack) return;
   stack.innerHTML = ALL_SECTIONS.map(function(sec) {
@@ -513,8 +582,25 @@ function renderSections() {
       );
     }).join('');
 
+    const burninHtml = sec.hasBurnin ? (
+      '<div class="burnin-grid">' +
+        '<div class="burnin-cell field">' +
+          '<label for="burninStart">เริ่มวันที่ / เวลา</label>' +
+          '<input type="text" id="burninStart" placeholder="เช่น 27/11/2026 09:00">' +
+        '</div>' +
+        '<div class="burnin-cell field">' +
+          '<label for="burninEnd">สิ้นสุดวันที่ / เวลา</label>' +
+          '<input type="text" id="burninEnd" placeholder="เช่น 28/11/2026 09:00">' +
+        '</div>' +
+        '<div class="burnin-cell field">' +
+          '<label for="burninDuration">รวมระยะเวลา</label>' +
+          '<input type="text" id="burninDuration" placeholder="เช่น 24 ชั่วโมง">' +
+        '</div>' +
+      '</div>'
+    ) : '';
+
     return (
-      '<div class="sec-card">' +
+      '<div class="sec-block">' +
         '<div class="sec-head">' +
           '<div class="sec-title-wrap">' +
             '<span class="sec-num">' + sec.num + '</span>' +
@@ -523,23 +609,12 @@ function renderSections() {
           '<span class="sec-count">' + sec.items.length + ' รายการ</span>' +
         '</div>' +
         rowsHtml +
+        burninHtml +
       '</div>'
     );
   }).join('');
+  restoreMetaToDOM();
   updateSummary();
-}
-
-function onFreqChange() {
-  const checked = document.querySelector('input[name="freq"]:checked');
-  const val = checked ? checked.value : 'รายวัน';
-  document.querySelectorAll('#freqRow .freq-pill').forEach(function(pill) {
-    const input = pill.querySelector('input[name="freq"]');
-    pill.classList.toggle('active', Boolean(input && input.checked));
-  });
-  const otherInput = document.getElementById('freqOther');
-  const isOther = val === 'อื่น ๆ';
-  otherInput.classList.toggle('show', isOther);
-  if (isOther) otherInput.focus();
 }
 
 function setChoice(key, status) {
@@ -554,7 +629,17 @@ function markAllOK() {
 
 function clearForm() {
   answers = {};
-  document.getElementById('remark').value = '';
+  metaDraft = {
+    box_code: '',
+    inspector: '',
+    signer_inspector: '',
+    signer_approver: '',
+    burnin_start: '',
+    burnin_end: '',
+    burnin_duration: '',
+    remark: ''
+  };
+  restoreMetaToDOM();
   renderSections();
 }
 
@@ -567,25 +652,25 @@ function updateSummary() {
   document.getElementById('sumNg').textContent = ngCount;
 }
 
-function getFrequency() {
-  const checked = document.querySelector('input[name="freq"]:checked');
-  const picked = checked ? checked.value : 'รายวัน';
-  const extra = document.getElementById('freqOther').value.trim();
-  return picked === 'อื่น ๆ' && extra ? 'อื่น ๆ (' + extra + ')' : picked;
-}
-
 async function submitChecksheet() {
+  syncMetaFromDOM();
   const vals = Object.values(answers);
   const okCount = vals.filter(function(v) { return v === 'ปกติ'; }).length;
   const ngCount = vals.filter(function(v) { return v === 'ผิดปกติ'; }).length;
+  const inspectorVal = metaDraft.signer_inspector.trim() || metaDraft.inspector.trim() || '-';
+
   const record = {
     check_date: document.getElementById('checkDate').value,
-    inspector: document.getElementById('inspector').value.trim() || '-',
-    frequency: getFrequency(),
+    box_code: metaDraft.box_code.trim() || '-',
+    inspector: inspectorVal,
+    approver: metaDraft.signer_approver.trim() || '-',
+    burnin_start: metaDraft.burnin_start.trim(),
+    burnin_end: metaDraft.burnin_end.trim(),
+    burnin_duration: metaDraft.burnin_duration.trim(),
     total_items: ALL_ITEMS.length,
     ok_count: okCount,
     ng_count: ngCount,
-    remark: document.getElementById('remark').value.trim() || '-',
+    remark: metaDraft.remark.trim() || '-',
     detail: answers
   };
 
@@ -594,15 +679,15 @@ async function submitChecksheet() {
   localStorage.setItem(LOCAL_KEY, JSON.stringify(localHistory));
   renderHistory(localHistory);
 
-  if (!OEE_GAS_URL.startsWith('https://script.google.com/')) {
-    alert('บันทึกในเครื่องแล้ว (ยังไม่ได้ใส่ OEE_GAS_URL)');
+  if (!OEE_BOX_GAS_URL.startsWith('https://script.google.com/')) {
+    alert('บันทึกในเครื่องแล้ว (ยังไม่ได้ใส่ OEE_BOX_GAS_URL)');
     return;
   }
 
   const badge = document.getElementById('syncBadge');
   badge.textContent = 'Google Sheets: กำลังบันทึก...';
   try {
-    const res = await fetch(OEE_GAS_URL, {
+    const res = await fetch(OEE_BOX_GAS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(record)
@@ -611,12 +696,18 @@ async function submitChecksheet() {
     if (!res.ok || out.ok === false) throw new Error(out.error || 'บันทึกไม่สำเร็จ');
     badge.textContent = 'Google Sheets: บันทึกแล้ว';
     await loadHistory();
-    alert('บันทึกผลการตรวจสอบเรียบร้อยแล้วค่ะ');
+    alert('บันทึกผลการตรวจสอบกล่อง iSmart OEE เรียบร้อยแล้วค่ะ');
   } catch (err) {
     console.error(err);
     badge.textContent = 'บันทึกเฉพาะในเครื่อง';
     alert('บันทึกในเครื่องแล้ว แต่ส่งไป Google Sheets ไม่สำเร็จ');
   }
+}
+
+function formatBurnin(r) {
+  if (r.burnin_duration) return r.burnin_duration;
+  if (r.burnin_start || r.burnin_end) return (r.burnin_start || '-') + ' → ' + (r.burnin_end || '-');
+  return '-';
 }
 
 function renderHistory(list) {
@@ -625,11 +716,12 @@ function renderHistory(list) {
     return (
       '<tr>' +
         '<td>' + (r.check_date || '-') + '</td>' +
+        '<td><strong>' + (r.box_code || '-') + '</strong></td>' +
         '<td>' + (r.inspector || '-') + '</td>' +
-        '<td>' + (r.frequency || '-') + '</td>' +
         '<td>' + (r.total_items != null ? r.total_items : ALL_ITEMS.length) + '</td>' +
         '<td style="color:#34d399;font-weight:600;">' + (r.ok_count != null ? r.ok_count : 0) + '</td>' +
         '<td style="color:#f87171;font-weight:600;">' + (r.ng_count != null ? r.ng_count : 0) + '</td>' +
+        '<td>' + formatBurnin(r) + '</td>' +
         '<td>' + (r.remark || '-') + '</td>' +
       '</tr>'
     );
@@ -639,9 +731,9 @@ function renderHistory(list) {
 async function loadHistory() {
   const localHistory = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
   renderHistory(localHistory);
-  if (!OEE_GAS_URL.startsWith('https://script.google.com/')) return;
+  if (!OEE_BOX_GAS_URL.startsWith('https://script.google.com/')) return;
   try {
-    const res = await fetch(OEE_GAS_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    const res = await fetch(OEE_BOX_GAS_URL + '?t=' + Date.now(), { cache: 'no-store' });
     const data = await res.json();
     if (data && Array.isArray(data.logs) && data.logs.length > 0) {
       renderHistory(data.logs);
